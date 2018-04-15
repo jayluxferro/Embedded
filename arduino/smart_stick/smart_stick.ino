@@ -16,6 +16,8 @@
 
 RH_ASK driver;
 
+#define water_detect 5
+
 void setup(){
   pinMode(trigPin, OUTPUT);
 
@@ -24,6 +26,7 @@ void setup(){
   pinMode(motor, OUTPUT);
 
   pinMode(buzzer,OUTPUT);
+  pinMode(water_detect, INPUT);
   Serial.begin(9600);
   if (!driver.init())
     Serial.println("init failed");
@@ -75,17 +78,22 @@ void loop(){
   } 
   delay(500);
 
-  Serial.println(distance);
+  //Serial.println(digitalRead(water_detect));
+  //Serial.println(distance);
   //Serial.println(moisture());
+  moisture();
 }
 
-long moisture(){
+void moisture(){
   /*
     output_value= analogRead(sensor_pin);
    
    output_value = map(output_value,550,0,0,100);
    */
-  return analogRead(A0);
+  long output_value =  analogRead(A0);
+  if(output_value < 1022){
+     trigger(); 
+  }
 }
 
 
