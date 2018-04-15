@@ -18,6 +18,8 @@ RH_ASK driver;
 
 #define water_detect 5
 
+int moisture_status = 0;
+
 void setup(){
   pinMode(trigPin, OUTPUT);
 
@@ -92,7 +94,11 @@ void moisture(){
    */
   long output_value =  analogRead(A0);
   if(output_value < 1022){
-     trigger(); 
+    moisture_status += 1;
+    if(moisture_status >= 3){
+       trigger(); 
+       moisture_status = 0;
+    }
   }
 }
 
