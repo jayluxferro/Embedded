@@ -32,12 +32,8 @@ void loop()
     const char *msg = "Find stick!";
     driver.send((uint8_t *)msg, strlen(msg));
     driver.waitPacketSent();
-    delay(1000);    
-  } 
-  else {
-    // Do nothing
+    delay(200);    
   }
-
 }
 
 

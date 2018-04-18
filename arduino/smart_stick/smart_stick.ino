@@ -1,7 +1,7 @@
 /*
   Project: Smart Blind Stick
- Date: 29th March, 2018
- */
+  Date: 29th March, 2018
+*/
 #include <RH_ASK.h>
 #include <SPI.h> // Not actualy used but needed to compile
 
@@ -20,14 +20,14 @@ RH_ASK driver;
 
 int moisture_status = 0;
 
-void setup(){
+void setup() {
   pinMode(trigPin, OUTPUT);
 
   pinMode(echoPin, INPUT);
 
   pinMode(motor, OUTPUT);
 
-  pinMode(buzzer,OUTPUT);
+  pinMode(buzzer, OUTPUT);
   pinMode(water_detect, INPUT);
   Serial.begin(9600);
   if (!driver.init())
@@ -36,7 +36,7 @@ void setup(){
 }
 
 
-void loop(){
+void loop() {
   uint8_t buf[12];
   uint8_t buflen = sizeof(buf);
   if (driver.recv(buf, &buflen)) // Non-blocking
@@ -44,77 +44,78 @@ void loop(){
     int i;
     // Message with a good checksum received, dump it.
     Serial.print("Message: ");
-    Serial.println((char*)buf);    
-    trigger();    
+    Serial.println((char*)buf);
+    trigger(500);
   }
   long duration, distance;
 
-  digitalWrite(trigPin, LOW); 
+  digitalWrite(trigPin, LOW);
 
-  delayMicroseconds(2); 
+  delayMicroseconds(2);
 
   digitalWrite(trigPin, HIGH);
 
-  delayMicroseconds(10); 
+  delayMicroseconds(10);
 
   digitalWrite(trigPin, LOW);
 
   duration = pulseIn(echoPin, HIGH);
 
   //distance = (duration/2) / 29.1;
-  distance= duration*0.034/2;
+  distance = duration * 0.034 / 2;
 
+  //Serial.println(distance);
   if (distance  < 100)// This is where checking the distanceyou can change the value
 
-  { 
-     trigger();
-  } 
+  {
+    trigger(distance * 10);
+    //Serial.println(distance);
+  }
   else
 
   {
 
-    digitalWrite(motor,LOW);// when greater than 100cm
+    digitalWrite(motor, LOW); // when greater than 100cm
 
-    digitalWrite(buzzer,LOW); 
+    digitalWrite(buzzer, LOW);
 
-  } 
+  }
   delay(500);
 
   //Serial.println(digitalRead(water_detect));
   //Serial.println(distance);
   //Serial.println(moisture());
-  moisture();
+  moisture(500);
 }
 
-void moisture(){
+void moisture(int distance) {
   /*
     output_value= analogRead(sensor_pin);
-   
-   output_value = map(output_value,550,0,0,100);
-   */
+
+    output_value = map(output_value,550,0,0,100);
+  */
+  //Serial.println(analogRead(A0));
+
+  //return;
   long output_value =  analogRead(A0);
-  if(output_value < 1022){
-    moisture_status += 1;
-    if(moisture_status >= 3){
-       trigger(); 
-       moisture_status = 0;
-    }
+  if (output_value < 500) {
+    trigger(distance);
   }
 }
 
 
-void trigger(){
-    digitalWrite(motor,HIGH); // When the the distance below 100cm
+void trigger(int timeout) {
+  digitalWrite(motor, HIGH); // When the the distance below 100cm
 
-    digitalWrite(buzzer,HIGH);
+  digitalWrite(buzzer, HIGH);
 
-    delay(500);
+  delay(timeout);
 
-    digitalWrite(motor, LOW);
+  digitalWrite(motor, LOW);
 
-    digitalWrite(buzzer, LOW);
+  digitalWrite(buzzer, LOW);
 
-    delay(500);
+  delay(timeout);
 }
 
 
