@@ -1,24 +1,19 @@
 /*
   Project: Smart Blind Stick
   Date: 29th March, 2018
+  Receiver code
 */
-#include <RH_ASK.h>
-#include <SPI.h> // Not actualy used but needed to compile
+#include <VirtualWire.h>
 
 #define trigPin 9
 
 #define echoPin 8
 
-
 #define motor 7
 
 #define buzzer 6
 
-RH_ASK driver;
-
 #define water_detect 5
-
-int moisture_status = 0;
 
 void setup() {
   pinMode(trigPin, OUTPUT);
@@ -30,21 +25,22 @@ void setup() {
   pinMode(buzzer, OUTPUT);
   pinMode(water_detect, INPUT);
   Serial.begin(9600);
-  if (!driver.init())
-    Serial.println("init failed");
+  vw_set_ptt_inverted(true);
+  vw_set_rx_pin(12);
+  vw_setup(4000);
+  vw_rx_start();
 
 }
 
 
 void loop() {
-  uint8_t buf[12];
-  uint8_t buflen = sizeof(buf);
-  if (driver.recv(buf, &buflen)) // Non-blocking
+  uint8_t buf[VW_MAX_MESSAGE_LEN];
+  uint8_t buflen = VW_MAX_MESSAGE_LEN;
+  if (vw_get_message(buf, &buflen)) // Non-blocking
   {
-    int i;
+    //int i;
     // Message with a good checksum received, dump it.
-    Serial.print("Message: ");
-    Serial.println((char*)buf);
+    Serial.println("Stick found... ");
     trigger(500);
   }
   long duration, distance;

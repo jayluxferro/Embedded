@@ -4,20 +4,18 @@
  Transmitter
  */
 
-#include <RH_ASK.h>
-#include <SPI.h> // Not actually used but needed to compile
-
-RH_ASK driver;
+#include <VirtualWire.h>
 
 const int buttonPin = 2;     // the number of the pushbutton pin
 int buttonState = 0; 
-
+char *controller;
 void setup()
 {
   pinMode(buttonPin, INPUT);
   Serial.begin(9600);   // Debugging only
-  if (!driver.init())
-    Serial.println("init failed");
+  vw_set_ptt_inverted(true);
+  vw_set_tx_pin(12);
+  vw_setup(4000);
 }
 
 void loop()
@@ -27,12 +25,11 @@ void loop()
   // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
   if (buttonState == HIGH) {
     // send data
-    Serial.println("Finding smart blind stick...");
-    
-    const char *msg = "Find stick!";
-    driver.send((uint8_t *)msg, strlen(msg));
-    driver.waitPacketSent();
-    delay(200);    
+    controller = "1";
+    vw_send((uint8_t *)controller, strlen(controller));
+    vw_wait_tx();
+    delay(2000);
+    Serial.println("Searching for stick");
   }
 }
 
