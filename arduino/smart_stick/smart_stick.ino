@@ -94,9 +94,11 @@ void moisture(int distance) {
 
   //return;
   long output_value =  analogRead(A0);
-  if (output_value < 500) {
+  Serial.println(output_value);
+  if (output_value < 700) {
     trigger(distance);
   }
+  delay(distance);
 }
 
 
